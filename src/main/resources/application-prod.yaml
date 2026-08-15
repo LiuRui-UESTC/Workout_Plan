@@ -1,0 +1,28 @@
+# Railway / 生产环境配置
+spring:
+  application:
+    name: code_sports_rui_and_fei
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  h2:
+    console:
+      enabled: false
+
+server:
+  port: ${PORT:8080}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:ruifei-fitness-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256}
+    expiration: 604800000

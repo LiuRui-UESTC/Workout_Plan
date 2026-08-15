@@ -1,0 +1,7 @@
+.railwayignore
+.git
+.gitignore
+.idea
+*.md
+data/
+android-app/

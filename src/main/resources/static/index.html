@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#6C63FF">
+    <!-- iOS PWA 配置 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FitMate">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" href="/icon-180.png">
+    <link rel="manifest" href="/manifest.json">
+    <title>FitMate 健身记录</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- ========== 登录/注册页面 (覆盖层) ========== -->
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-container">
+            <div class="auth-logo">
+                <div class="auth-icon">&#x1F4AA;</div>
+                <h1 class="auth-title">FitMate</h1>
+                <p class="auth-subtitle">记录每一次进步</p>
+            </div>
+
+            <!-- 登录表单 -->
+            <div id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <input type="text" id="loginUsername" class="form-input auth-input" placeholder="用户名" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" class="form-input auth-input" placeholder="密码" autocomplete="current-password">
+                </div>
+                <button type="button" class="btn-auth" id="loginBtn">登 录</button>
+                <p class="auth-switch">还没有账号？<a href="#" id="showRegister">立即注册</a></p>
+            </div>
+
+            <!-- 注册表单 -->
+            <div id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <input type="text" id="regUsername" class="form-input auth-input" placeholder="用户名 (3-20字符)" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="regNickname" class="form-input auth-input" placeholder="昵称">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="regPassword" class="form-input auth-input" placeholder="密码 (至少6位)" autocomplete="new-password">
+                </div>
+                <div class="form-row auth-row">
+                    <div class="form-group half">
+                        <select id="regGender" class="form-input auth-input">
+                            <option value="">选择性别</option>
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group half">
+                        <input type="number" id="regHeight" class="form-input auth-input" placeholder="身高cm" step="0.1" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="avatar-label">选择头像</label>
+                    <div class="avatar-grid" id="avatarGrid">
+                        <button type="button" class="avatar-btn active" data-emoji="💪">💪</button>
+                        <button type="button" class="avatar-btn" data-emoji="🌸">🌸</button>
+                        <button type="button" class="avatar-btn" data-emoji="🔥">🔥</button>
+                        <button type="button" class="avatar-btn" data-emoji="⚡">⚡</button>
+                        <button type="button" class="avatar-btn" data-emoji="🦁">🦁</button>
+                        <button type="button" class="avatar-btn" data-emoji="🐱">🐱</button>
+                        <button type="button" class="avatar-btn" data-emoji="🏃">🏃</button>
+                        <button type="button" class="avatar-btn" data-emoji="🧘">🧘</button>
+                    </div>
+                </div>
+                <button type="button" class="btn-auth" id="registerBtn">注 册</button>
+                <p class="auth-switch">已有账号？<a href="#" id="showLogin">返回登录</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 主应用 ========== -->
+    <div id="appContainer" class="app-container" style="display:none;">
+        <!-- 顶部导航 -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="app-title">&#x1F4AA; FitMate</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info-header" id="userHeader">
+                    <span class="user-emoji" id="headerEmoji">💪</span>
+                    <span class="user-name" id="headerName">用户</span>
+                    <button class="btn-logout" id="logoutBtn" title="退出登录">&#x1F6AA;</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="app-content">
+
+            <!-- 首页仪表盘 -->
+            <section id="page-home" class="page active">
+                <div class="greeting-section">
+                    <h2 id="greetingText">Hi &#x1F44B;</h2>
+                    <p class="date-text" id="todayDate"></p>
+                </div>
+
+                <!-- 今日概览卡片 -->
+                <div class="stats-cards">
+                    <div class="stat-card card-primary">
+                        <div class="stat-icon">&#x1F525;</div>
+                        <div class="stat-value" id="todayCalories">0</div>
+                        <div class="stat-label">今日卡路里</div>
+                    </div>
+                    <div class="stat-card card-secondary">
+                        <div class="stat-icon">&#x23F1;&#xFE0F;</div>
+                        <div class="stat-value" id="todayDuration">0</div>
+                        <div class="stat-label">分钟</div>
+                    </div>
+                    <div class="stat-card card-accent">
+                        <div class="stat-icon">&#x1F4C5;</div>
+                        <div class="stat-value" id="weekStreak">0</div>
+                        <div class="stat-label">连续打卡</div>
+                    </div>
+                </div>
+
+                <!-- 情侣绑定 -->
+                <div class="section-header">
+                    <h3>&#x1F495; 情侣空间</h3>
+                </div>
+                <div class="partner-section" id="partnerSection">
+                    <div class="partner-unbind" id="partnerUnbind" style="display:none;">
+                        <div class="partner-info-card">
+                            <span class="partner-emoji" id="partnerEmoji"></span>
+                            <span class="partner-name" id="partnerName"></span>
+                            <span class="partner-status">已绑定</span>
+                        </div>
+                    </div>
+                    <div class="partner-bindcode" id="partnerBindcode">
+                        <p class="bind-hint">你的绑定码：<strong id="myBindCode">------</strong></p>
+                        <div class="bind-input-row">
+                            <input type="text" id="partnerCodeInput" class="form-input" placeholder="输入对方绑定码" maxlength="8">
+                            <button class="btn-small" id="bindPartnerBtn">绑定</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最近记录 -->
+                <div class="section-header">
+                    <h3>&#x1F4CB; 最近动态</h3>
+                </div>
+                <div class="activity-list" id="recentActivity">
+                    <div class="empty-state">暂无记录，快去运动吧!</div>
+                </div>
+            </section>
+
+            <!-- 记录页 -->
+            <section id="page-record" class="page">
+                <h2 class="page-title">&#x1F3CB;&#xFE0F; 记录运动</h2>
+                <form id="workoutForm" class="form-container">
+                    <div class="form-group">
+                        <label>运动类型</label>
+                        <div class="type-grid" id="workoutTypeGrid"></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>日期</label>
+                            <input type="date" id="workoutDate" class="form-input">
+                        </div>
+                        <div class="form-group half">
+                            <label>时长(分钟)</label>
+                            <input type="number" id="workoutDuration" class="form-input" placeholder="60" min="1">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>卡路里(kcal)</label>
+                            <input type="number" id="workoutCalories" class="form-input" placeholder="300" min="0" step="0.1">
+                        </div>
+                        <div class="form-group half">
+                            <label>距离(km)</label>
+                            <input type="number" id="workoutDistance" class="form-input" placeholder="5.0" min="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>心情</label>
+                        <div class="mood-selector" id="moodSelector">
+                            <button type="button" class="mood-btn" data-mood="1">&#x1F629;</button>
+                            <button type="button" class="mood-btn" data-mood="2">&#x1F614;</button>
+                            <button type="button" class="mood-btn" data-mood="3">&#x1F642;</button>
+                            <button type="button" class="mood-btn active" data-mood="4">&#x1F604;</button>
+                            <button type="button" class="mood-btn" data-mood="5">&#x1F929;</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>备注</label>
+                        <textarea id="workoutNotes" class="form-input form-textarea" placeholder="今天的运动感受..." rows="3"></textarea>
+                    </div>
+
+                    <!-- 力量训练详细记录 -->
+                    <div class="exercise-section" id="exerciseSection" style="display:none;">
+                        <div class="section-header">
+                            <h3>&#x1F4AA; 动作记录</h3>
+                            <button type="button" class="btn-add-exercise" id="addExerciseBtn">+ 添加动作</button>
+                        </div>
+                        <div id="exerciseList"></div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submitWorkout">&#x2705; 保存记录</button>
+                </form>
+            </section>
+
+            <!-- 统计页 -->
+            <section id="page-stats" class="page">
+                <h2 class="page-title">&#x1F4CA; 数据统计</h2>
+
+                <div class="stats-period-selector">
+                    <button class="period-btn active" data-period="week">本周</button>
+                    <button class="period-btn" data-period="month">本月</button>
+                    <button class="period-btn" data-period="all">全部</button>
+                </div>
+
+                <!-- 总览统计 -->
+                <div class="stats-overview" id="statsOverview">
+                    <div class="overview-card">
+                        <div class="overview-value" id="statWorkoutCount">0</div>
+                        <div class="overview-label">运动次数</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-value" id="statTotalCalories">0</div>
+                        <div class="overview-label">总卡路里</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-value" id="statTotalDuration">0</div>
+                        <div class="overview-label">总时长(分钟)</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-value" id="statTotalDistance">0</div>
+                        <div class="overview-label">总距离(km)</div>
+                    </div>
+                </div>
+
+                <!-- 运动类型分布 -->
+                <div class="chart-section">
+                    <h3>&#x1F3AF; 运动类型分布</h3>
+                    <canvas id="typeChart" width="300" height="300"></canvas>
+                    <div class="type-legend" id="typeLegend"></div>
+                </div>
+
+                <!-- 情侣对比 -->
+                <div class="couple-compare" id="coupleCompare" style="display:none;">
+                    <h3>&#x1F491; 情侣PK</h3>
+                    <div class="compare-bars" id="compareBars"></div>
+                </div>
+            </section>
+
+            <!-- 我的页 -->
+            <section id="page-profile" class="page">
+                <h2 class="page-title">&#x1F464; 我的</h2>
+
+                <!-- 用户信息卡 -->
+                <div class="profile-card" id="profileCard">
+                    <div class="profile-avatar" id="profileAvatar">&#x1F4AA;</div>
+                    <div class="profile-info">
+                        <div class="profile-name" id="profileName">用户</div>
+                        <div class="profile-meta" id="profileMeta"></div>
+                    </div>
+                </div>
+
+                <!-- 体测记录 -->
+                <div class="section-header">
+                    <h3>&#x1F4CF; 体测数据</h3>
+                    <button class="btn-small" id="addMeasurementBtn">+ 记录</button>
+                </div>
+                <div class="measurement-list" id="measurementList">
+                    <div class="empty-state">暂无体测数据</div>
+                </div>
+
+                <!-- 体测记录表单(默认隐藏) -->
+                <div class="form-container measurement-form" id="measurementForm" style="display:none;">
+                    <h3>记录体测数据</h3>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>日期</label>
+                            <input type="date" id="measurementDate" class="form-input">
+                        </div>
+                        <div class="form-group half">
+                            <label>体重(kg)</label>
+                            <input type="number" id="measurementWeight" class="form-input" step="0.1" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>体脂率(%)</label>
+                            <input type="number" id="measurementBodyFat" class="form-input" step="0.1" min="0">
+                        </div>
+                        <div class="form-group half">
+                            <label>胸围(cm)</label>
+                            <input type="number" id="measurementChest" class="form-input" step="0.1" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>腰围(cm)</label>
+                            <input type="number" id="measurementWaist" class="form-input" step="0.1" min="0">
+                        </div>
+                        <div class="form-group half">
+                            <label>臀围(cm)</label>
+                            <input type="number" id="measurementHip" class="form-input" step="0.1" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>臂围(cm)</label>
+                            <input type="number" id="measurementArm" class="form-input" step="0.1" min="0">
+                        </div>
+                        <div class="form-group half">
+                            <label>大腿围(cm)</label>
+                            <input type="number" id="measurementThigh" class="form-input" step="0.1" min="0">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" id="cancelMeasurement">取消</button>
+                        <button type="button" class="btn-submit" id="saveMeasurement">保存</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部导航 -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-page="home">
+                <span class="nav-icon">&#x1F3E0;</span>
+                <span class="nav-text">首页</span>
+            </button>
+            <button class="nav-btn" data-page="record">
+                <span class="nav-icon">&#x2795;</span>
+                <span class="nav-text">记录</span>
+            </button>
+            <button class="nav-btn" data-page="stats">
+                <span class="nav-icon">&#x1F4CA;</span>
+                <span class="nav-text">统计</span>
+            </button>
+            <button class="nav-btn" data-page="profile">
+                <span class="nav-icon">&#x1F464;</span>
+                <span class="nav-text">我的</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
