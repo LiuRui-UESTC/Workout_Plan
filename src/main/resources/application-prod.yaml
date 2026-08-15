@@ -3,10 +3,14 @@ spring:
   application:
     name: code_sports_rui_and_fei
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    # Railway 提供 PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE 单独变量
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 30000
   jpa:
     hibernate:
       ddl-auto: update
