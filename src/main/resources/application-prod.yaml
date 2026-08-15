@@ -3,10 +3,11 @@ spring:
   application:
     name: code_sports_rui_and_fei
   datasource:
-    # Railway 提供 PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE 单独变量
-    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
-    username: ${PGUSER}
-    password: ${PGPASSWORD}
+    # Railway 提供 DATABASE_URL (postgresql://user:pass@host:port/db)
+    # 也提供 PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE 单独变量
+    url: ${JDBC_DATABASE_URL:jdbc:postgresql://${PGHOST:localhost}:${PGPORT:5432}/${PGDATABASE:fitness}}
+    username: ${PGUSER:postgres}
+    password: ${PGPASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -30,3 +31,9 @@ app:
   jwt:
     secret: ${JWT_SECRET:ruifei-fitness-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256}
     expiration: 604800000
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    com.project.dev: DEBUG
